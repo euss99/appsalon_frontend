@@ -1,9 +1,26 @@
 <script setup>
+import { ref } from "vue";
+import VueTailwindDatePicker from "vue-tailwind-datepicker";
 import ServiceSelected from "@/components/ServiceSelected.vue";
 import { formatCurrency } from "@/helpers";
 import { useAppointmentsStore } from "@/stores/appointments";
 
 const appointmentsStore = useAppointmentsStore();
+
+const formatter = ref({
+  date: "DD/MM/YYYY",
+  month: "MMM",
+});
+
+const disableDate = (date) => {
+  const today = new Date();
+
+  return (
+    date < today ||
+    date.getMonth() > today.getMonth() + 1 ||
+    [0, 6].includes(date.getDay())
+  );
+};
 </script>
 
 <template>
@@ -35,5 +52,50 @@ const appointmentsStore = useAppointmentsStore();
         formatCurrency(appointmentsStore.totalAmount)
       }}</span>
     </p>
+  </div>
+
+  <div class="space-y-8" v-if="!appointmentsStore.noServicesSelected">
+    <h3 class="text-3xl font-extrabold text-white">Fecha y Hora</h3>
+
+    <div class="lg: flex flex-col lg:flex-row gap-5">
+      <div class="w-full lg:w-96 flex justify-center rounded-md">
+        <VueTailwindDatePicker
+          :disable-date="disableDate"
+          i18n="es-mx"
+          as-single
+          no-input
+          :formatter="formatter"
+          v-model="appointmentsStore.date"
+        />
+      </div>
+
+      <div
+        class="w-full flex-1 grid grid-cols-1 lg:grid-cols-2 gap-5 mt-10 lg:m-0"
+      >
+        <button
+          type="button"
+          v-for="hour in appointmentsStore.hours"
+          class="block rounded-md text-xl font-black p-3"
+          :class="[
+            appointmentsStore.time === hour
+              ? 'bg-blue-500 text-white'
+              : 'bg-white text-blue-500',
+          ]"
+          @click="appointmentsStore.time = hour"
+        >
+          {{ hour }}
+        </button>
+      </div>
+    </div>
+
+    <div v-if="appointmentsStore.isValidReservation" class="flex justify-end">
+      <button
+        type="button"
+        class="w-full md:w-auto bg-blue-500 p-3 rounded-md uppercase font-black text-white"
+        @click="appointmentsStore.createAppointment"
+      >
+        Confirmar reservación
+      </button>
+    </div>
   </div>
 </template>
