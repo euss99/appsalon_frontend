@@ -14,11 +14,23 @@ defineProps({
 
 <template>
   <div
-    class="p-5 space-y-5 rounded-md cursor-pointer bg-white"
+    class="p-5 space-y-5 rounded-md cursor-pointer"
+    :class="[
+      appointmentsStore.isServiceSelected(service._id)
+        ? 'bg-blue-500 text-white'
+        : 'bg-white',
+    ]"
     @click="appointmentsStore.onServiceSelected(service)"
   >
     <p class="text-2xl font-light">{{ service.name }}</p>
-    <p class="text-3xl font-black text-blue-600">
+    <p
+      class="text-3xl font-black"
+      :class="[
+        appointmentsStore.isServiceSelected(service._id)
+          ? 'text-blue-900'
+          : 'text-blue-600',
+      ]"
+    >
       {{ formatCurrency(service.price) }}
     </p>
   </div>

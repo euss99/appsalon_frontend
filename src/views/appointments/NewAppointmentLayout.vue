@@ -5,5 +5,7 @@ import HeaderNewAppointment from "@/components/HeaderNewAppointment.vue";
 
 <template>
   <HeaderNewAppointment />
-  <RouterView />
+  <div class="space-y-5">
+    <RouterView />
+  </div>
 </template>
