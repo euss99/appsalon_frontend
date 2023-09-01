@@ -14,7 +14,14 @@ const router = createRouter({
       path: "/reservaciones",
       name: "appointments",
       component: AppointmentsLayout,
+      meta: { requiresAuth: true }, // GUARD de navegación, solo se puede acceder si está logueado
       children: [
+        {
+          path: "",
+          name: "my-appointments",
+          component: () =>
+            import("../views/appointments/MyAppointmentsView.vue"),
+        },
         {
           path: "nueva",
           component: () =>
@@ -58,6 +65,28 @@ const router = createRouter({
       ],
     },
   ],
+});
+
+/* 
+  El beforeEach se ejecuta antes de mandar a llamar a la ruta y mostrar la información,
+  ya que antes de mostrar la información queremos validar si el usuario está logueado o no.
+  to: ruta a la que se quiere acceder
+  from: ruta desde la que se quiere acceder
+  next: función que se ejecuta para continuar con la navegación
+*/
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.matched.some((url) => url.meta.requiresAuth); // Verifica si la ruta a la que se quiere acceder tiene el meta requiresAuth, retorna true o false.
+
+  if (requiresAuth) {
+    // Si la ruta a la que se quiere acceder requiere autenticación
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    // Si la ruta a la que se quiere acceder no requiere autenticación
+    next(); // Continúa con la navegación
+  }
 });
 
 export default router;

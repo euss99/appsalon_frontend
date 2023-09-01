@@ -19,12 +19,13 @@ import { RouterLink } from "vue-router";
       </div>
 
       <nav class="flex gap-2 items-center justify-end">
-        <button
+        <RouterLink
           type="button"
           class="p-3 text-gray-200 uppercase text-xs font-extrabold rounded-md"
+          :to="{ name: 'my-appointments' }"
         >
           Mis citas
-        </button>
+        </RouterLink>
 
         <RouterLink
           :to="{ name: 'new-appointment' }"

@@ -1,5 +1,8 @@
 <script setup>
-import { RouterView, RouterLink } from "vue-router";
+import { RouterView, RouterLink, useRoute } from "vue-router";
+
+const route = useRoute();
+// console.log(route.name)
 
 const authRoutes = [
   { name: "register", text: "Crear una cuenta" },
