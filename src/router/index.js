@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AppointmentsLayout from "../views/appointments/AppointmentsLayout.vue";
+import AuthAPI from "../api/AuthAPI";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,8 +81,10 @@ router.beforeEach(async (to, from, next) => {
   if (requiresAuth) {
     // Si la ruta a la que se quiere acceder requiere autenticación
     try {
+      await AuthAPI.userAuth(); // Se verifica si el usuario está logueado
+      next(); // Continúa con la navegación
     } catch (error) {
-      console.log(error);
+      next({ name: "login" }); // Si no está logueado, se redirecciona al login
     }
   } else {
     // Si la ruta a la que se quiere acceder no requiere autenticación

@@ -1,5 +1,14 @@
 <script setup>
 import { RouterLink } from "vue-router";
+
+defineProps({
+  username: {
+    type: String,
+    required: true,
+  },
+});
+
+defineEmits(["logout-user"]);
 </script>
 
 <template>
@@ -8,11 +17,12 @@ import { RouterLink } from "vue-router";
 
     <div class="flex flex-col space-y-5">
       <div class="flex gap-3 items-center">
-        <p class="text-white text-right">Hola: Username</p>
+        <p class="text-white text-right">Hola: {{ username }}</p>
 
         <button
           type="button"
           class="bg-red-600 hover:bg-red-700 p-3 text-white uppercase text-xs font-extrabold rounded-md"
+          @click="$emit('logout-user')"
         >
           Cerrar sesión
         </button>
