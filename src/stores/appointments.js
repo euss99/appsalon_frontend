@@ -1,12 +1,20 @@
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, inject, watch } from "vue";
 import { defineStore } from "pinia";
+import { useRouter } from "vue-router";
+
 import AppointmentsAPI from "../api/AppointmentsAPI";
+import { convertToISO } from "../helpers/dates";
+import { da } from "date-fns/locale";
 
 export const useAppointmentsStore = defineStore("appointments", () => {
   const services = ref([]);
   const date = ref("");
   const hours = ref([]);
   const time = ref("");
+  const appointmentsByDate = ref([]);
+
+  const toast = inject("toast");
+  const router = useRouter();
 
   onMounted(() => {
     const startHour = 10;
@@ -14,6 +22,18 @@ export const useAppointmentsStore = defineStore("appointments", () => {
 
     for (let hour = startHour; hour <= endHour; hour++) {
       hours.value.push(hour + ":00");
+    }
+  });
+
+  watch(date, async () => {
+    time.value = ""; // Cada vez que cambie la fecha, se borra la hora
+    if (date.value === "") return;
+    // Cada vez que cambie la fecha, se ejecuta esta función
+    try {
+      const { data } = await AppointmentsAPI.getByDate(date.value);
+      appointmentsByDate.value = data;
+    } catch (error) {
+      console.log(error);
     }
   });
 
@@ -31,6 +51,19 @@ export const useAppointmentsStore = defineStore("appointments", () => {
 
   const isValidReservation = computed(() => {
     return services.value.length && date.value.length && time.value.length;
+  });
+
+  const isDateSelected = computed(() => {
+    return date.value ? true : false;
+  });
+
+  const disableTime = computed(() => {
+    return (hour) => {
+      // Si la hora está en el array de horas y hay una cita en esa hora, se deshabilita
+      return appointmentsByDate.value.find(
+        (appointment) => appointment.time === hour
+      );
+    };
   });
 
   function onServiceSelected(service) {
@@ -58,16 +91,30 @@ export const useAppointmentsStore = defineStore("appointments", () => {
   async function createAppointment() {
     const appointment = {
       services: services.value.map((service) => service._id),
-      date: date.value,
+      date: convertToISO(date.value), // Funcion que convierte la fecha a ISO
       time: time.value,
       totalAmount: totalAmount.value,
     };
 
     try {
-      const response = await AppointmentsAPI.createAppointment(appointment);
+      const { data } = await AppointmentsAPI.createAppointment(appointment);
+
+      toast.open({
+        message: data.msg,
+        type: "success",
+      });
+
+      router.push({ name: "my-appointments" });
+      clearAppointment();
     } catch (error) {
       console.log(error);
     }
+  }
+
+  function clearAppointment() {
+    services.value = [];
+    date.value = "";
+    time.value = "";
   }
 
   return {
@@ -79,6 +126,8 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     totalAmount,
     noServicesSelected,
     isValidReservation,
+    isDateSelected,
+    disableTime,
     onServiceSelected,
     deselectService,
     createAppointment,

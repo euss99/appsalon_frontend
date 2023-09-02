@@ -11,12 +11,7 @@ export default {
     return api.post("/auth/login", data);
   },
   userAuth() {
-    const token = localStorage.getItem("AUTH_TOKEN"); // Se obtiene el token del localStorage
-    return api.get("/auth/user", {
-      headers: {
-        Authorization: `Bearer ${token}`, // Aquí se envía el token en el header
-      },
-    });
+    return api.get("/auth/user");
   },
 };
 
