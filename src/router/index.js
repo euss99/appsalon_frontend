@@ -13,7 +13,6 @@ const router = createRouter({
     },
     {
       path: "/reservaciones",
-      name: "appointments",
       component: AppointmentsLayout,
       meta: { requiresAuth: true }, // GUARD de navegación, solo se puede acceder si está logueado
       children: [
@@ -36,6 +35,24 @@ const router = createRouter({
             {
               path: "detalles",
               name: "details-appointment",
+              component: () =>
+                import("../views/appointments/DetailsAppointmentView.vue"),
+            },
+          ],
+        },
+        {
+          path: ":id/editar",
+          component: () =>
+            import("../views/appointments/EditAppointmentLayout.vue"),
+          children: [
+            {
+              path: "", // Queremos que aparezca cuando sea /nueva
+              name: "edit-appointment",
+              component: () => import("../views/appointments/ServicesView.vue"),
+            },
+            {
+              path: "detalles",
+              name: "edit-details-appointment",
               component: () =>
                 import("../views/appointments/DetailsAppointmentView.vue"),
             },

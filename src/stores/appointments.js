@@ -66,6 +66,12 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     };
   });
 
+  function setSelectedAppointment(appointment) {
+    console.log(appointment);
+
+    services.value = appointment.services;
+  }
+
   function onServiceSelected(service) {
     const isDuplicateService = services.value.some(
       (selectedService) => selectedService._id === service._id
@@ -128,6 +134,7 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     isValidReservation,
     isDateSelected,
     disableTime,
+    setSelectedAppointment,
     onServiceSelected,
     deselectService,
     createAppointment,
