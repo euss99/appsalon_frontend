@@ -2,7 +2,6 @@
 import { RouterLink } from "vue-router";
 import { convertToString } from "../helpers/dates";
 import { formatCurrency } from "../helpers/index";
-import { id } from "date-fns/locale";
 defineProps({
   appointment: {
     type: Object,

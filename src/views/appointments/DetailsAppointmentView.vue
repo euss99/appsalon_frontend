@@ -94,7 +94,7 @@ const disableDate = (date) => {
       <button
         type="button"
         class="w-full md:w-auto bg-blue-500 p-3 rounded-md uppercase font-black text-white"
-        @click="appointmentsStore.createAppointment"
+        @click="appointmentsStore.saveAppointment"
       >
         Confirmar reservación
       </button>

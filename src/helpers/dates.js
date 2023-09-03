@@ -21,3 +21,9 @@ export function convertToString(dateISO) {
 
   return formattedDate;
 }
+
+export function convertToDDMMYYYY(dateISO) {
+  const newDate = new Date(dateISO); // Convierte la fecha ISO a Date
+  const formattedDate = format(newDate, "dd/MM/yyyy"); // Convierte la fecha Date a string con el formato "dd/MM/yyyy"
+  return formattedDate;
+}

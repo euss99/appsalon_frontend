@@ -3,8 +3,8 @@ import { defineStore } from "pinia";
 import { useRouter } from "vue-router";
 
 import AppointmentsAPI from "../api/AppointmentsAPI";
-import { convertToISO } from "../helpers/dates";
-import { da } from "date-fns/locale";
+import { convertToISO, convertToDDMMYYYY } from "../helpers/dates";
+import { useUserStore } from "../stores/user";
 
 export const useAppointmentsStore = defineStore("appointments", () => {
   const services = ref([]);
@@ -12,9 +12,11 @@ export const useAppointmentsStore = defineStore("appointments", () => {
   const hours = ref([]);
   const time = ref("");
   const appointmentsByDate = ref([]);
+  const appointmentId = ref("");
 
   const toast = inject("toast");
   const router = useRouter();
+  const userStore = useUserStore();
 
   onMounted(() => {
     const startHour = 10;
@@ -31,7 +33,23 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     // Cada vez que cambie la fecha, se ejecuta esta función
     try {
       const { data } = await AppointmentsAPI.getByDate(date.value);
-      appointmentsByDate.value = data;
+
+      // Verificar si se quiere editar la fecha de una cita
+      if (appointmentId.value) {
+        // Si appointmentId tiene un valor, se está editando una cita.
+        appointmentsByDate.value = data.filter(
+          (appointment) => appointment._id !== appointmentId.value
+        ); // Filtrar las citas que no sean la cita que se está editando
+        console.log(appointmentsByDate.value);
+
+        const currentAppointment = data.filter(
+          (appointment) => appointment._id === appointmentId.value
+        )[0]; // Obtener la cita que se está editando
+        time.value = currentAppointment.time; // Asignar la hora de la cita que se está editando
+      } else {
+        // Si appointmentId no tiene un valor, se está creando una cita.
+        appointmentsByDate.value = data;
+      }
     } catch (error) {
       console.log(error);
     }
@@ -67,9 +85,9 @@ export const useAppointmentsStore = defineStore("appointments", () => {
   });
 
   function setSelectedAppointment(appointment) {
-    console.log(appointment);
-
+    appointmentId.value = appointment._id;
     services.value = appointment.services;
+    date.value = convertToDDMMYYYY(appointment.date);
   }
 
   function onServiceSelected(service) {
@@ -94,7 +112,7 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     );
   }
 
-  async function createAppointment() {
+  async function saveAppointment() {
     const appointment = {
       services: services.value.map((service) => service._id),
       date: convertToISO(date.value), // Funcion que convierte la fecha a ISO
@@ -102,22 +120,40 @@ export const useAppointmentsStore = defineStore("appointments", () => {
       totalAmount: totalAmount.value,
     };
 
-    try {
-      const { data } = await AppointmentsAPI.createAppointment(appointment);
+    if (appointmentId.value) {
+      try {
+        const { data } = await AppointmentsAPI.updateAppointment(
+          appointmentId.value,
+          appointment
+        );
 
-      toast.open({
-        message: data.msg,
-        type: "success",
-      });
+        toast.open({
+          message: data.msg,
+          type: "success",
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const { data } = await AppointmentsAPI.createAppointment(appointment);
 
-      router.push({ name: "my-appointments" });
-      clearAppointment();
-    } catch (error) {
-      console.log(error);
+        toast.open({
+          message: data.msg,
+          type: "success",
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
+
+    clearAppointment();
+    userStore.getUserAppointments(); // Actualizar las citas del usuario
+    router.push({ name: "my-appointments" });
   }
 
   function clearAppointment() {
+    appointmentId.value = "";
     services.value = [];
     date.value = "";
     time.value = "";
@@ -137,6 +173,7 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     setSelectedAppointment,
     onServiceSelected,
     deselectService,
-    createAppointment,
+    saveAppointment,
+    clearAppointment,
   };
 });

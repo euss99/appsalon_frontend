@@ -1,7 +1,5 @@
 import api from "../lib/axios";
 
-const token = localStorage.getItem("AUTH_TOKEN");
-
 export default {
   createAppointment(appointment) {
     return api.post("/appointments", appointment);
@@ -14,5 +12,8 @@ export default {
   },
   getById(id) {
     return api.get(`/appointments/${id}`);
+  },
+  updateAppointment(id, data) {
+    return api.put(`/appointments/${id}`, data);
   },
 };
