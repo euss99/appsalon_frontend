@@ -40,7 +40,6 @@ export const useAppointmentsStore = defineStore("appointments", () => {
         appointmentsByDate.value = data.filter(
           (appointment) => appointment._id !== appointmentId.value
         ); // Filtrar las citas que no sean la cita que se está editando
-        console.log(appointmentsByDate.value);
 
         const currentAppointment = data.filter(
           (appointment) => appointment._id === appointmentId.value
@@ -152,6 +151,26 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     router.push({ name: "my-appointments" });
   }
 
+  async function deleteAppointment(id) {
+    if (confirm("¿Deseas cancelar esta cita?")) {
+      try {
+        const { data } = await AppointmentsAPI.deleteAppointment(id);
+
+        toast.open({
+          message: data.msg,
+          type: "success",
+        });
+
+        userStore.getUserAppointments();
+      } catch (error) {
+        toast.open({
+          message: error.response.data.msg,
+          type: "error",
+        });
+      }
+    }
+  }
+
   function clearAppointment() {
     appointmentId.value = "";
     services.value = [];
@@ -174,6 +193,7 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     onServiceSelected,
     deselectService,
     saveAppointment,
+    deleteAppointment,
     clearAppointment,
   };
 });

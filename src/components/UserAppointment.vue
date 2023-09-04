@@ -1,7 +1,11 @@
 <script setup>
 import { RouterLink } from "vue-router";
-import { convertToString } from "../helpers/dates";
-import { formatCurrency } from "../helpers/index";
+import { convertToString } from "@/helpers/dates";
+import { formatCurrency } from "@/helpers/index";
+import { useAppointmentsStore } from "../stores/appointments";
+
+const appointmentsStore = useAppointmentsStore();
+
 defineProps({
   appointment: {
     type: Object,
@@ -45,6 +49,7 @@ defineProps({
 
       <button
         class="bg-red-600 rounded-md p-3 text-white text-sm uppercase font-black flex-1 md:flex-none"
+        @click="appointmentsStore.deleteAppointment(appointment._id)"
       >
         Cancelar cita
       </button>

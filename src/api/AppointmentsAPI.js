@@ -16,4 +16,7 @@ export default {
   updateAppointment(id, data) {
     return api.put(`/appointments/${id}`, data);
   },
+  deleteAppointment(id) {
+    return api.delete(`/appointments/${id}`);
+  },
 };
