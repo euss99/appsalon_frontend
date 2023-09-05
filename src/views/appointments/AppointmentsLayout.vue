@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderAppointments from "@/components/HeaderAppointments.vue";
-import { useUserStore } from "../../stores/user";
+import { useUserStore } from "@/stores/user";
 
 const userStore = useUserStore();
 </script>

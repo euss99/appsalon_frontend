@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 import AppointmentsLayout from "../views/appointments/AppointmentsLayout.vue";
+import AdminLayoutVue from "../views/admin/AdminLayout.vue";
 import AuthAPI from "../api/AuthAPI";
 
 const router = createRouter({
@@ -8,8 +8,20 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "home",
-      component: HomeView,
+      redirect: { name: "my-appointments" },
+    },
+    {
+      path: "/admin",
+      name: "admin",
+      meta: { requiresAdmin: true }, // GUARD de navegación, solo se puede acceder si es admin
+      component: () => AdminLayoutVue,
+      children: [
+        {
+          path: "",
+          name: "admin-appointments",
+          component: () => import("../views/admin/AppointmentsView.vue"),
+        },
+      ],
     },
     {
       path: "/reservaciones",
@@ -102,20 +114,42 @@ const router = createRouter({
   from: ruta desde la que se quiere acceder
   next: función que se ejecuta para continuar con la navegación
 */
+
+// GUARD de navegación que verifica si el usuario está logueado
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some((url) => url.meta.requiresAuth); // Verifica si la ruta a la que se quiere acceder tiene el meta requiresAuth, retorna true o false.
 
   if (requiresAuth) {
     // Si la ruta a la que se quiere acceder requiere autenticación
     try {
-      await AuthAPI.userAuth(); // Se verifica si el usuario está logueado
-      next(); // Continúa con la navegación
+      const { data } = await AuthAPI.userAuth(); // Se verifica si el usuario está logueado
+      if (data.admin) {
+        next({ name: "admin" }); // Si el usuario es admin, se redirecciona a la ruta /admin
+      } else {
+        next(); // Continúa con la navegación
+      }
     } catch (error) {
       next({ name: "login" }); // Si no está logueado, se redirecciona al login
     }
   } else {
     // Si la ruta a la que se quiere acceder no requiere autenticación
     next(); // Continúa con la navegación
+  }
+});
+
+// GUARD de navegación que verifica si el usuario es admin
+router.beforeEach(async (to, from, next) => {
+  const requiresAdmin = to.matched.some((url) => url.meta.requiresAdmin); // Verifica si la ruta a la que se quiere acceder tiene el meta requiresAdmin, retorna true o false.
+
+  if (requiresAdmin) {
+    try {
+      await AuthAPI.adminAuth(); // Se verifica si el usuario es admin
+      next(); // Si es admin, se continúa con la navegación
+    } catch (error) {
+      next({ name: "login" }); // Si no es admin, se redirecciona al login
+    }
+  } else {
+    next(); // Si la ruta a la que se quiere acceder no requiere ser admin, se continúa con la navegación
   }
 });
 

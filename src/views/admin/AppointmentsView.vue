@@ -1,16 +1,14 @@
 <script setup>
 import { useUserStore } from "@/stores/user";
-import UserAppointment from "@/components/UserAppointment.vue";
+import AdminAppointment from "@/components/AdminAppointment.vue";
 
 const userStore = useUserStore();
 </script>
 
 <template>
-  <h1 class="text-4xl font-extrabold text-white mt-10">Mis citas</h1>
-  <p class="text-xl text-white mt-5">
-    A continuación podras administrar tus proximas citas
+  <p class="text-white text-lg mt-5">
+    A continación podrás administrar tus proximas citas
   </p>
-
   <p v-if="userStore.loading" class="text-white text-2xl text-center mt-5">
     Cargando...
   </p>
@@ -19,11 +17,10 @@ const userStore = useUserStore();
       v-if="userStore.noAppointmentsUser"
       class="text-white text-2xl text-center mt-5"
     >
-      No tienes proximas citas
+      No tienes próximas citas
     </p>
-
-    <div v-else class="grid grid-cols-1 gap-5 mt-10">
-      <UserAppointment
+    <div v-else class="space-y-3">
+      <AdminAppointment
         v-for="appointment in userStore.userAppointments"
         :key="appointment._id"
         :appointment="appointment"
