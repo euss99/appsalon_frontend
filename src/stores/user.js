@@ -16,7 +16,7 @@ export const useUserStore = defineStore("user", () => {
       const { data } = await AuthAPI.userAuth();
       user.value = data;
 
-      await getUserAppointments(); // Cuando user.value tenga valor, se ejecuta esta función
+      await getUserAppointments();
     } catch (error) {
       console.log(error);
     } finally {
@@ -38,7 +38,6 @@ export const useUserStore = defineStore("user", () => {
     router.push({ name: "login" });
   }
 
-  // Función para obtener las citas del usuario
   async function getUserAppointments() {
     const { data } = await AppointmentsAPI.getUserAppointments(user.value._id);
     userAppointments.value = data;

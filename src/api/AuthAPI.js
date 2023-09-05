@@ -26,10 +26,3 @@ export default {
     return api.patch(`/auth/forgot-password/${token}`, data);
   },
 };
-
-/*
-  El segundo parámetro de un get es un objeto de configuración, donde podemos especificar
-  los headers, los parámetros, etc.
-  El segundo parámetro de un post es el body, donde se envía la información que se quiere
-  enviar al servidor, y el tercer parámetro es el objeto de configuración.
-*/

@@ -28,25 +28,21 @@ export const useAppointmentsStore = defineStore("appointments", () => {
   });
 
   watch(date, async () => {
-    time.value = ""; // Cada vez que cambie la fecha, se borra la hora
+    time.value = "";
     if (date.value === "") return;
-    // Cada vez que cambie la fecha, se ejecuta esta función
     try {
       const { data } = await AppointmentsAPI.getByDate(date.value);
 
-      // Verificar si se quiere editar la fecha de una cita
       if (appointmentId.value) {
-        // Si appointmentId tiene un valor, se está editando una cita.
         appointmentsByDate.value = data.filter(
           (appointment) => appointment._id !== appointmentId.value
-        ); // Filtrar las citas que no sean la cita que se está editando
+        );
 
         const currentAppointment = data.filter(
           (appointment) => appointment._id === appointmentId.value
-        )[0]; // Obtener la cita que se está editando
-        time.value = currentAppointment.time; // Asignar la hora de la cita que se está editando
+        )[0];
+        time.value = currentAppointment.time;
       } else {
-        // Si appointmentId no tiene un valor, se está creando una cita.
         appointmentsByDate.value = data;
       }
     } catch (error) {
@@ -76,7 +72,6 @@ export const useAppointmentsStore = defineStore("appointments", () => {
 
   const disableTime = computed(() => {
     return (hour) => {
-      // Si la hora está en el array de horas y hay una cita en esa hora, se deshabilita
       return appointmentsByDate.value.find(
         (appointment) => appointment.time === hour
       );
@@ -114,7 +109,7 @@ export const useAppointmentsStore = defineStore("appointments", () => {
   async function saveAppointment() {
     const appointment = {
       services: services.value.map((service) => service._id),
-      date: convertToISO(date.value), // Funcion que convierte la fecha a ISO
+      date: convertToISO(date.value),
       time: time.value,
       totalAmount: totalAmount.value,
     };
@@ -147,7 +142,7 @@ export const useAppointmentsStore = defineStore("appointments", () => {
     }
 
     clearAppointment();
-    userStore.getUserAppointments(); // Actualizar las citas del usuario
+    userStore.getUserAppointments();
     router.push({ name: "my-appointments" });
   }
 

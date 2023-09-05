@@ -8,12 +8,6 @@ const appointmentStore = useAppointmentsStore();
 
 onMounted(() => {
   appointmentStore.clearAppointment();
-
-  /* 
-    Apenas cargue el componente queremos que limpie el store de appointments, este componente es un layout pero,
-    afectará a los componentes hijos, por lo que no es necesario que cada componente hijo se le aplique la función
-    clearAppointment, ya que este componente padre lo hará por ellos.
-  */
 });
 </script>
 

@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
-      meta: { requiresAdmin: true }, // GUARD de navegación, solo se puede acceder si es admin
+      meta: { requiresAdmin: true },
       component: () => AdminLayoutVue,
       children: [
         {
@@ -26,7 +26,7 @@ const router = createRouter({
     {
       path: "/reservaciones",
       component: AppointmentsLayout,
-      meta: { requiresAuth: true }, // GUARD de navegación, solo se puede acceder si está logueado
+      meta: { requiresAuth: true },
       children: [
         {
           path: "",
@@ -40,7 +40,7 @@ const router = createRouter({
             import("../views/appointments/NewAppointmentLayout.vue"),
           children: [
             {
-              path: "", // Queremos que aparezca cuando sea /nueva
+              path: "",
               name: "new-appointment",
               component: () => import("../views/appointments/ServicesView.vue"),
             },
@@ -58,7 +58,7 @@ const router = createRouter({
             import("../views/appointments/EditAppointmentLayout.vue"),
           children: [
             {
-              path: "", // Queremos que aparezca cuando sea /nueva
+              path: "",
               name: "edit-appointment",
               component: () => import("../views/appointments/ServicesView.vue"),
             },
@@ -107,49 +107,37 @@ const router = createRouter({
   ],
 });
 
-/* 
-  El beforeEach se ejecuta antes de mandar a llamar a la ruta y mostrar la información,
-  ya que antes de mostrar la información queremos validar si el usuario está logueado o no.
-  to: ruta a la que se quiere acceder
-  from: ruta desde la que se quiere acceder
-  next: función que se ejecuta para continuar con la navegación
-*/
-
-// GUARD de navegación que verifica si el usuario está logueado
 router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.matched.some((url) => url.meta.requiresAuth); // Verifica si la ruta a la que se quiere acceder tiene el meta requiresAuth, retorna true o false.
+  const requiresAuth = to.matched.some((url) => url.meta.requiresAuth);
 
   if (requiresAuth) {
-    // Si la ruta a la que se quiere acceder requiere autenticación
     try {
-      const { data } = await AuthAPI.userAuth(); // Se verifica si el usuario está logueado
+      const { data } = await AuthAPI.userAuth();
       if (data.admin) {
-        next({ name: "admin" }); // Si el usuario es admin, se redirecciona a la ruta /admin
+        next({ name: "admin" });
       } else {
-        next(); // Continúa con la navegación
+        next();
       }
     } catch (error) {
-      next({ name: "login" }); // Si no está logueado, se redirecciona al login
+      next({ name: "login" });
     }
   } else {
-    // Si la ruta a la que se quiere acceder no requiere autenticación
-    next(); // Continúa con la navegación
+    next();
   }
 });
 
-// GUARD de navegación que verifica si el usuario es admin
 router.beforeEach(async (to, from, next) => {
-  const requiresAdmin = to.matched.some((url) => url.meta.requiresAdmin); // Verifica si la ruta a la que se quiere acceder tiene el meta requiresAdmin, retorna true o false.
+  const requiresAdmin = to.matched.some((url) => url.meta.requiresAdmin);
 
   if (requiresAdmin) {
     try {
-      await AuthAPI.adminAuth(); // Se verifica si el usuario es admin
-      next(); // Si es admin, se continúa con la navegación
+      await AuthAPI.adminAuth();
+      next();
     } catch (error) {
-      next({ name: "login" }); // Si no es admin, se redirecciona al login
+      next({ name: "login" });
     }
   } else {
-    next(); // Si la ruta a la que se quiere acceder no requiere ser admin, se continúa con la navegación
+    next();
   }
 });
 
